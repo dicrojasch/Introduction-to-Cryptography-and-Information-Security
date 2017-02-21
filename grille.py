@@ -14,33 +14,18 @@ def rotateHoles(holes, n, clockwise): # n: size matrix, clockwise: true indicate
     holes = sorted(holes) # Sort the points
     return holes
 
-def printMatrix(Matrix):
-    message = ""
+def printMatrix(Matrix): # Function for print a matrix orderly and print the matriz as a phrase in line
+    message = ""    # Variable that will contain the message in as a phrase in line
     print
     print "The cipher matrix is: "
-    for x in Matrix:
+    for x in Matrix:    # Loop over the matrix
         for y in x:
-            print y,
-            message = message + y
+            print y,    # Print each element of the matrix
+            message = message + y   # Acumulate all letters of the message
         print
     print
     print "The cipher message in line is: "
-    print message
-
-# n = 3
-# matrix = []
-# i = 65
-# for x in range(n):
-#     temp = []
-#     for y in range(n):
-#         temp.append(chr(i))
-#         i+=1
-#     matrix.append(temp)
-#
-# print printMatrix(matrix)
-# print
-# print printMatrix(rotate(matrix,1))
-
+    print message  # Print the message
 
 print "Insert the size of the grid: "
 n = int(sys.stdin.readline().strip()) # get the size of the grid
@@ -67,24 +52,27 @@ temp = list(set(temp))   # delete repeated
 holes = []
 for i in temp:
     holes.append([i/n, i%n])
+holes = sorted(holes)
 print "Insert the message: "
 message = sys.stdin.readline().strip() # Get the message
 print message
 if cipher == 0:
     Matrix = [[" " for x in xrange(n)] for y in xrange(n)] # Create matrix nxn
-    for z in xrange(len(message)):
-        if z % len(holes) == 0 and z != 0:
-            holes = rotateHoles(holes, n, clockwise)
-        Matrix[holes[z%len(holes)][0]][holes[z%len(holes)][1]] = message[z]
-    printMatrix(Matrix)
+    repeated = [[False for x in xrange(n)] for y in xrange(n)] # Matrix to avoid overwrite holes overlapped
+    for z in xrange(len(message)):  # Loop each word in the message
+        if z % len(holes) == 0 and z != 0: # chech if all holes for rotation have letters
+            holes = rotateHoles(holes, n, clockwise)    # Rotate holes of the matrix
+        if  not repeated[holes[z%len(holes)][0]][holes[z%len(holes)][1]]:
+            repeated[holes[z%len(holes)][0]][holes[z%len(holes)][1]] = True
+            Matrix[holes[z%len(holes)][0]][holes[z%len(holes)][1]] = message[z] # Put each letter on the holes of the matriz
+    printMatrix(Matrix)     # Print the matrix
 else:
     M = ""
-    for z in xrange(4):
-        for w in holes:
-            M = M + message[w[0]*n+w[1]]
-        holes = rotateHoles(holes, n, clockwise)
-    print "The original message is: ",M
-
-
-
-
+    repeated = [[False for x in xrange(n)] for y in xrange(n)] # Matrix to avoid overwrite holes overlapped
+    for z in xrange(4):  # Loop 4 times, each time is a rotation
+        for w in holes:     # Loop the holes of the matrix
+            if  not repeated[w[0]][w[1]]:
+                M = M + message[w[0]*n+w[1]]    # Accumulate each letter per appropriate hole
+                repeated[w[0]][w[1]] = True
+        holes = rotateHoles(holes, n, clockwise)    # After loop all holes, do a rotation
+    print "The original message is: ",M  # Print the original message
